@@ -1,7 +1,5 @@
 local M = {}
 
-local ts_utils = require("nvim-treesitter.ts_utils")
-
 M.opts = {
   show_on_winbar = false
 }
@@ -17,10 +15,18 @@ local get_node_text = function(node, bufnr)
   return vim.treesitter.get_node_text(node, bufnr)
 end
 
+local get_children = function(node)
+  local children = {}
+  for child in node:iter_children() do
+    table.insert(children, child)
+  end
+  return children
+end
+
 local get_string_content = function(node, bufnr)
   bufnr = bufnr or 0
 
-  for _, child in ipairs(ts_utils.get_named_children(node)) do
+  for _, child in ipairs(get_children(node)) do
     if child:type() == "string_content" then
       return get_node_text(child, bufnr)
     end
@@ -37,7 +43,7 @@ local contains_special_characters = function(str)
   return str:match("[^a-zA-Z0-9_]")
 end
 
----Create a jsonpath based of `node`. 
+---Create a jsonpath based of `node`.
 ---If no node is provided, it will use the node at the cursor for the current buffer.
 ---@param start_node unknown The node to create the jsonpath from.
 ---@param bufnr number The buffer number to use. If none, the current buffer will be used
@@ -73,8 +79,9 @@ M.get = function(start_node, bufnr)
     if node:type() == "array" then
       accessor = "[]"
 
-      for i, child in ipairs(ts_utils.get_named_children(node)) do
-        if ts_utils.is_parent(child, current_node) then
+      for i, child in ipairs(get_children(node)) do
+        local parent = current_node:parent()
+        if parent == child then
           accessor = string.format("[%d]", i - 1)
         end
       end
