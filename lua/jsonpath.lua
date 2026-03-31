@@ -82,7 +82,8 @@ M.get = function(start_node, bufnr)
       for i, child in ipairs(get_children(node)) do
         local parent = current_node:parent()
         if parent == child then
-          accessor = string.format("[%d]", i - 1)
+          --accessor = string.format("[%d]", i - 1)
+          accessor = string.format("[%d]", (i - 2) / 2)
         end
       end
     end
