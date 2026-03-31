@@ -80,10 +80,12 @@ M.get = function(start_node, bufnr)
       accessor = "[]"
 
       for i, child in ipairs(get_children(node)) do
-        local parent = current_node:parent()
-        if parent == child then
-          --accessor = string.format("[%d]", i - 1)
-          accessor = string.format("[%d]", (i - 2) / 2)
+        local node2 = current_node
+        while node2 do
+          if node2 == child then
+            accessor = string.format("[%d]", (i - 2) / 2)
+          end
+          node2 = node2:parent()
         end
       end
     end
