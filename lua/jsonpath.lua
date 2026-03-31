@@ -61,6 +61,7 @@ M.get = function(start_node, bufnr)
 
   local accessors = {}
   local node = current_node
+  local node_child = nil
 
   while node do
     local accessor = ""
@@ -80,12 +81,8 @@ M.get = function(start_node, bufnr)
       accessor = "[]"
 
       for i, child in ipairs(get_children(node)) do
-        local node2 = current_node
-        while node2 do
-          if node2 == child then
-            accessor = string.format("[%d]", (i - 2) / 2)
-          end
-          node2 = node2:parent()
+        if child == node_child then
+          accessor = string.format("[%d]", (i - 2) / 2)
         end
       end
     end
@@ -94,6 +91,7 @@ M.get = function(start_node, bufnr)
       table.insert(accessors, 1, accessor)
     end
 
+    node_child = node
     node = node:parent()
   end
 
